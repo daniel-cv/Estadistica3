@@ -1,0 +1,190 @@
+---
+title: "Accountability - Participación Ciudadana"
+output: html_notebook
+---
+
+Librerias
+
+```{r}
+library(jsonlite) #para extraer datos del API
+library(stringr) #para limpieza de columnas (extracciÃÂÃÂ³n de numeros, particiones)
+library(readr)   #para extraer un ÃÂÃÂºnico numero de la columna
+library(htmltab) #para scraping
+library(rio)
+library(dplyr) #para recodificar variables ordenandolas de forma ascendente
+```
+
+### 1) Participacion ciudadana
+
+Importamos los datos
+
+```{r}
+lkCSV = "https://github.com/daniel-cv/Estadistica2/raw/master/EGOV_DATA_2020.csv"
+participacion = import(lkCSV)
+```
+
+Verificamos
+
+```{r}
+names(participacion)
+head(participacion)
+str(participacion)
+```
+
+La data esta limpia.
+Procedemos a eliminar columnas innecesarias
+
+```{r}
+participacion$`Survey Year`= NULL
+participacion$`E-Government Rank` = NULL
+participacion$`E-Government Index` = NULL
+participacion$`Online Service Index` = NULL
+participacion$`Human Capital Index` = NULL
+participacion$`Telecommunication Infrastructure Index` = NULL
+```
+
+Verificamos
+
+```{r}
+names(participacion)
+```
+
+Cambiamos el nombre de las variables
+
+```{r}
+names(participacion) = c("Pais", "Participacion")
+```
+
+Verificamos nuevamente
+
+```{r}
+head(participacion, 20)
+str(participacion)
+```
+
+Nos damos cuenta de que existe un espacio en blanco en los países. Lo eliminamos
+
+```{r}
+participacion[,] = lapply(participacion[,], trimws, whitespace = "[\\h\\v]")
+```
+ 
+Convertimos a numerico
+
+```{r}
+participacion$Participacion = as.numeric(participacion$Participacion)
+```
+
+
+Verificacion final
+
+```{r}
+str(participacion)
+```
+
+
+
+### 2) Eficiencia del Estado
+
+importamos los datos
+
+```{r}
+lkDTA = "https://github.com/daniel-cv/Estadistica3/raw/master/wgidataset.dta"
+gobernanza = import(lkDTA)
+```
+
+Verificamos
+
+```{r}
+names(gobernanza)
+head(gobernanza)
+str(gobernanza)
+```
+
+Seleccionamos los datos del 2019
+
+```{r}
+Gobernanza = filter(gobernanza, year == 2019)
+head(Gobernanza)
+names(Gobernanza)
+```
+
+Como observamos, tenemos muchas columnas, con datos que no necesitamos. Entonces eliminamos las columnas sobrantes
+
+```{r}
+Gobernanza$code = NULL
+Gobernanza$vas = NULL
+Gobernanza$van = NULL
+Gobernanza$var = NULL
+Gobernanza$val = NULL
+Gobernanza$vau = NULL
+Gobernanza$pvs = NULL
+Gobernanza$pvn = NULL
+Gobernanza$pvr = NULL
+Gobernanza$pvu = NULL
+Gobernanza$ges = NULL
+Gobernanza$gen = NULL
+Gobernanza$ger = NULL
+Gobernanza$gel = NULL
+Gobernanza$geu = NULL
+Gobernanza$rqs = NULL
+Gobernanza$rqn = NULL
+Gobernanza$rqr = NULL
+Gobernanza$rql = NULL
+Gobernanza$rqu = NULL
+Gobernanza$rls = NULL
+Gobernanza$rln = NULL
+Gobernanza$rlr = NULL
+Gobernanza$rll = NULL
+Gobernanza$rlu = NULL
+Gobernanza$ccs = NULL
+Gobernanza$ccn = NULL
+Gobernanza$ccr = NULL
+Gobernanza$ccl = NULL
+Gobernanza$pvl = NULL
+Gobernanza$rll = NULL
+Gobernanza$ccu = NULL
+Gobernanza$vae = NULL
+Gobernanza$pve = NULL
+Gobernanza$rle= NULL
+Gobernanza$year = NULL
+```
+
+Tras eliminar las columnas sobrantes nos quedamos con "Pais", "Eficiencia del Estado", "Calidad regulatoria" y "Control de corrupcion".
+
+Verificamos
+
+```{r}
+names(Gobernanza)
+```
+
+Ahora cambiamos los nombres de las variables
+
+
+```{r}
+names(Gobernanza) = c("Pais", "Eficiencia", "CalidadReg", "ControlCorr")
+```
+
+Eliminamos los datos perdidos
+
+```{r}
+#Verificamos donde estan
+Gobernanza[!complete.cases(Gobernanza),]
+
+#Los eliminamos
+GOBERNANZA = na.omit(Gobernanza)
+```
+
+Ahora realizamos el merge con participacion ciudadana
+
+```{r}
+accountability = merge(GOBERNANZA , participacion)
+head(accountability)
+str(accountability)
+```
+
+Guardamos el archivo
+
+```{r}
+write.csv(accountability, "accountability.csv", row.names = F)
+```
+
