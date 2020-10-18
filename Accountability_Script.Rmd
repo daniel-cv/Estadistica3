@@ -1,0 +1,161 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Instalamos librerias
+
+```{r}
+library(stringr)
+library(magrittr)
+library(rio)
+library(cluster)
+library(plyr) # para funcion "each"
+library(psych) #para hacer tablas comparadas
+library(knitr) #para generar tablas html
+library(kableExtra) #para generar tablas html
+library(factoextra) #visualizaciÃÂÃÂÃÂÃÂ³n de clusters
+library(ggrepel) #para que las etiquetas de los graficos no se superpongan
+library(htmltab)
+library(dplyr)
+library(dbscan) #para metodo de densidad
+library(fpc) #para obtener clusters por densidad
+library(ggplot2)
+library(DescTools)
+library(car)
+library(psych)
+library(gplots)
+library(haven)
+library(foreign)
+library(psychTools)
+```
+
+Importamos datos
+
+```{r}
+link = "https://github.com/orlando-20181209/Entrega-1/raw/master/BaseFinalmerge.csv"
+data = import(link)
+```
+
+### VARIABLE ACCOUNTABILITY
+
+Agrupamos nuestra variable
+
+```{r}
+names(data)
+accountability = data[,(11:14)]
+```
+
+### 1) Análisis univariado
+
+Medidas de tendencia central
+
+```{r}
+summary(accountability)
+```
+
+Histogramas
+
+```{r}
+hist(accountability$Eficiencia)
+```
+
+```{r}
+hist(accountability$CalidadReg)
+```
+
+```{r}
+hist(accountability$ControlCorr)
+```
+
+```{r}
+hist(accountability$Participacion)
+```
+
+Otras medidas
+
+```{r}
+describeBy(accountability)
+```
+
+Boxplot
+
+```{r}
+boxplot(accountability$Eficiencia)
+```
+
+```{r}
+boxplot(accountability$CalidadReg)
+```
+
+```{r}
+boxplot(accountability$ControlCorr)
+```
+
+```{r}
+boxplot(accountability$Participacion)
+```
+
+### 2) Análisis bivariado
+
+# a. Eficiencia
+
+Grafico de dispersion
+
+```{r}
+plot(data$Eficiencia~data$gastosocial,data=data, main="Eficiencia y Gasto Social",
+     xlab="Gasto social", ylab="Eficiencia", pch=19)
+```
+
+
+Prueba de Pearson
+
+```{r}
+cor.test(data$Eficiencia, data$gastosocial)
+```
+
+# b. Calidad regulatoria
+
+Grafico de dispersion
+
+```{r}
+plot(data$CalidadReg~data$gastosocial,data=data, main="Calidad Regulatoria y Gasto Social",
+     xlab="Gasto social", ylab="Calidad Regulatoria", pch=19)
+```
+
+Prueba de Pearson
+
+```{r}
+cor.test(data$CalidadReg, data$gastosocial)
+```
+
+# c. Control de corrupcion
+
+Grafico de dispersion
+
+```{r}
+plot(data$ControlCorr~data$gastosocial,data=data, main="Control de corrupcion y Gasto Social",
+     xlab="Gasto social", ylab="Control de corrupcion", pch=19)
+```
+
+Prueba de Pearson
+
+```{r}
+cor.test(data$ControlCorr, data$gastosocial)
+```
+
+# d. Participacion
+
+Grafico de dispersion
+
+```{r}
+plot(data$Participacion~data$gastosocial,data=data, main="Participacion y Gasto Social",
+     xlab="Gasto social", ylab="Participacion", pch=19)
+```
+
+Prueba de Pearson
+
+```{r}
+cor.test(data$Participacion, data$gastosocial)
+```
+
